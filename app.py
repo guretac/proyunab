@@ -9,21 +9,28 @@ st.set_page_config(page_title="Dashboard Territorial", layout="wide")
 def load_data():
     try:
         df = pd.read_csv("Data2.csv", sep=",", encoding="utf-8", engine="python", on_bad_lines="skip")
-        df = df.dropna(subset=["Latitud", "Longitud"])
-        return df
-    except Exception as e:
-        st.warning("⚠️ No se pudo cargar 'Data2.csv'. Puedes subirlo manualmente:")
+    except:
         uploaded_file = st.file_uploader("Sube tu archivo CSV", type=["csv"])
         if uploaded_file is not None:
-            try:
-                df = pd.read_csv(uploaded_file, sep=",", encoding="utf-8", engine="python", on_bad_lines="skip")
-                df = df.dropna(subset=["Latitud", "Longitud"])
-                return df
-            except Exception as e2:
-                st.error(f"❌ Error al leer el archivo subido: {e2}")
-                st.stop()
+            df = pd.read_csv(uploaded_file, sep=",", encoding="utf-8", engine="python", on_bad_lines="skip")
         else:
             st.stop()
+
+    st.sidebar.markdown("### 🧪 Columnas detectadas:")
+    st.sidebar.write(list(df.columns))
+
+    # Selección manual si no se detectan columnas esperadas
+    lat_col = st.sidebar.selectbox("Columna de Latitud", options=df.columns, index=0)
+    lon_col = st.sidebar.selectbox("Columna de Longitud", options=df.columns, index=1)
+
+    try:
+        df = df.dropna(subset=[lat_col, lon_col])
+        df["Latitud"] = df[lat_col].astype(float)
+        df["Longitud"] = df[lon_col].astype(float)
+        return df
+    except Exception as e:
+        st.error(f"❌ Error al procesar columnas geográficas: {e}")
+        st.stop()
 
 # Cargar datos
 df = load_data()
