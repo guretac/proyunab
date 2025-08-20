@@ -1,10 +1,3 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Wed Aug 20 19:14:00 2025
-
-@author: guret
-"""
-
 import streamlit as st
 import pandas as pd
 import pydeck as pdk
@@ -12,20 +5,34 @@ import pydeck as pdk
 # Configuración inicial
 st.set_page_config(page_title="Dashboard Territorial", layout="wide")
 
-# Cargar datos
-@st.cache_data
+# Función robusta para cargar datos
 def load_data():
-    df = pd.read_csv("Data2.csv", sep=",", encoding="utf-8")
-    df = df.dropna(subset=["Latitud", "Longitud"])  # Asegura que haya coordenadas
-    return df
+    try:
+        df = pd.read_csv("Data2.csv", sep=",", encoding="utf-8", engine="python", on_bad_lines="skip")
+        df = df.dropna(subset=["Latitud", "Longitud"])
+        return df
+    except Exception as e:
+        st.warning("⚠️ No se pudo cargar 'Data2.csv'. Puedes subirlo manualmente:")
+        uploaded_file = st.file_uploader("Sube tu archivo CSV", type=["csv"])
+        if uploaded_file is not None:
+            try:
+                df = pd.read_csv(uploaded_file, sep=",", encoding="utf-8", engine="python", on_bad_lines="skip")
+                df = df.dropna(subset=["Latitud", "Longitud"])
+                return df
+            except Exception as e2:
+                st.error(f"❌ Error al leer el archivo subido: {e2}")
+                st.stop()
+        else:
+            st.stop()
 
+# Cargar datos
 df = load_data()
 
 # Sidebar: filtros
 st.sidebar.header("🎯 Filtros")
-region = st.sidebar.selectbox("Selecciona Región", options=df["Region"].unique())
-comuna = st.sidebar.selectbox("Selecciona Comuna", options=df[df["Region"] == region]["comuna"].unique())
-etapa = st.sidebar.multiselect("Etapa", options=df["Etapa"].unique(), default=df["Etapa"].unique())
+region = st.sidebar.selectbox("Selecciona Región", options=df["Region"].dropna().unique())
+comuna = st.sidebar.selectbox("Selecciona Comuna", options=df[df["Region"] == region]["comuna"].dropna().unique())
+etapa = st.sidebar.multiselect("Etapa", options=df["Etapa"].dropna().unique(), default=df["Etapa"].dropna().unique())
 
 # Filtrar datos
 filtered_df = df[
