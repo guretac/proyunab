@@ -20,8 +20,8 @@ def load_data():
     st.sidebar.write(list(df.columns))
 
     # Selección manual si no se detectan columnas esperadas
-    lat_col = st.sidebar.selectbox("Columna de Latitud", options=df.columns, index=0)
-    lon_col = st.sidebar.selectbox("Columna de Longitud", options=df.columns, index=1)
+    lat_col = st.sidebar.selectbox("Latitud", options=df.columns, index=0)
+    lon_col = st.sidebar.selectbox("Longitud", options=df.columns, index=1)
 
     try:
         df = df.dropna(subset=[lat_col, lon_col])
