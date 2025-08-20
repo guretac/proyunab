@@ -5,23 +5,23 @@ import pydeck as pdk
 # Configuración inicial
 st.set_page_config(page_title="Dashboard Territorial", layout="wide")
 
-# Función robusta para cargar datos
+# Función para cargar archivo Excel
 def load_data():
     try:
-        df = pd.read_csv("Data2.csv", sep=",", encoding="utf-8", engine="python", on_bad_lines="skip")
+        df = pd.read_excel("Data.xlsx")
     except:
-        uploaded_file = st.file_uploader("Sube tu archivo CSV", type=["csv"])
+        uploaded_file = st.file_uploader("Sube tu archivo Excel", type=["xlsx"])
         if uploaded_file is not None:
-            df = pd.read_csv(uploaded_file, sep=",", encoding="utf-8", engine="python", on_bad_lines="skip")
+            df = pd.read_excel(uploaded_file)
         else:
             st.stop()
 
     st.sidebar.markdown("### 🧪 Columnas detectadas:")
     st.sidebar.write(list(df.columns))
 
-    # Selección manual si no se detectan columnas esperadas
-    lat_col = st.sidebar.selectbox("Latitud", options=df.columns, index=0)
-    lon_col = st.sidebar.selectbox("Longitud", options=df.columns, index=1)
+    # Selección manual de columnas geográficas
+    lat_col = st.sidebar.selectbox("Columna de Latitud", options=df.columns)
+    lon_col = st.sidebar.selectbox("Columna de Longitud", options=df.columns)
 
     try:
         df = df.dropna(subset=[lat_col, lon_col])
