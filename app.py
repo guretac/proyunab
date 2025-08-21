@@ -34,37 +34,28 @@ def create_dashboard():
         # Sidebar filters
         st.sidebar.header('Filtros')
 
-        # Primer filtro: Región
-        regions = ['Todas'] + sorted(df['Region'].unique())
-        selected_region = st.sidebar.selectbox('Seleccionar Región', regions)
-        
-        # DataFrame temporal para encadenar los filtros
-        temp_df = df.copy()
-        if selected_region != 'Todas':
-            temp_df = temp_df[temp_df['Region'] == selected_region]
-        
-        # Segundo filtro: Comuna, que depende del primer filtro
-        comunas = ['Todas'] + sorted(temp_df['comuna'].unique())
+        # Filtro de Comuna
+        comunas = ['Todas'] + sorted(df['comuna'].unique())
         selected_comuna = st.sidebar.selectbox('Seleccionar Comuna', comunas)
 
-        # Aplicar el segundo filtro al DataFrame
-        filtered_df = temp_df.copy()
+        # Aplicar el filtro al DataFrame
+        filtered_df = df.copy()
         if selected_comuna != 'Todas':
             filtered_df = filtered_df[filtered_df['comuna'] == selected_comuna]
-
+            
         st.markdown('---')
 
         # Main content
         if not filtered_df.empty:
             
             # Display a map
-            st.markdown(f'### Ubicación de Proyectos en el Mapa para {selected_region} - {selected_comuna}')
+            st.markdown(f'### Ubicación de Proyectos en el Mapa para la comuna de {selected_comuna}')
             st.map(filtered_df[['Latitud', 'Longitud']].rename(columns={'Latitud': 'lat', 'Longitud': 'lon'}))
             
             st.markdown('---')
 
             st.markdown(f'### Datos de Proyectos')
-            st.dataframe(filtered_df[['Nombre_Ini', 'Anio_Presu', 'Etapa', 'Institucio', 'Costo_Tota', 'Region', 'comuna', 'Estado', 'Dimensione']])
+            st.dataframe(filtered_df[['Nombre_Ini', 'Anio_Presu', 'Etapa', 'Institucio', 'Costo_Tota', 'comuna', 'Estado', 'Dimensione']])
 
             st.markdown('---')
 
