@@ -23,7 +23,8 @@ def create_dashboard():
 
     if df is not None:
         # Pre-process the data
-        df['Costo_Tota'] = pd.to_numeric(df['Costo_Tota'].str.replace('.', '', regex=False), errors='coerce').fillna(0)
+        df['Costo_Tota'] = df['Costo_Tota'].astype(str).str.replace('.', '', regex=False)
+        df['Costo_Tota'] = pd.to_numeric(df['Costo_Tota'], errors='coerce').fillna(0)
         df['Latitud'] = pd.to_numeric(df['Latitud'], errors='coerce')
         df['Longitud'] = pd.to_numeric(df['Longitud'], errors='coerce')
         
