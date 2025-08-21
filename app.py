@@ -40,7 +40,7 @@ def create_dashboard():
 
         # Aplicar el filtro al DataFrame
         filtered_df = df.copy()
-        if selected_comuna != 'Todas':
+        if selected_comuna != 'Dimensione':
             filtered_df = filtered_df[filtered_df['Dimensione'] == selected_comuna]
             
         st.markdown('---')
