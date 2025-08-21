@@ -34,65 +34,23 @@ def create_dashboard():
         # Sidebar filters
         st.sidebar.header('Filtros')
 
-        # 1. Filtro por "Anio_Presu"
-        years = sorted(df['Anio_Presu'].unique())
-        selected_years = st.sidebar.multiselect('Año de Presupuesto', years, default=years)
+        # Filtros de nivel superior: las opciones se cargan del DataFrame original (df)
+        selected_region = st.sidebar.selectbox('Seleccionar Región', ['Todas'] + sorted(df['Region'].unique()))
+        
+        # Se genera un DataFrame temporal basado en la selección de la región
+        if selected_region != 'Todas':
+            temp_df = df[df['Region'] == selected_region]
+        else:
+            temp_df = df.copy()
 
-        # 2. Filtro por "Etapa"
-        stages = sorted(df['Etapa'].unique())
-        selected_stages = st.sidebar.multiselect('Etapa', stages, default=stages)
+        # Las opciones para la comuna ahora dependen del DataFrame temporal (temp_df)
+        selected_comuna = st.sidebar.selectbox('Seleccionar Comuna', ['Todas'] + sorted(temp_df['comuna'].unique()))
 
-        # 3. Filtro por "Institucio"
-        institutions = sorted(df['Institucio'].unique())
-        selected_institutions = st.sidebar.multiselect('Institución', institutions, default=institutions)
+        # Se crea el DataFrame final filtrado
+        filtered_df = temp_df.copy()
+        if selected_comuna != 'Todas':
+            filtered_df = filtered_df[filtered_df['comuna'] == selected_comuna]
 
-        # 4. Filtro por "Institucio_1"
-        institutions_1 = sorted(df['Institucio_1'].unique())
-        selected_institutions_1 = st.sidebar.multiselect('Institución_1', institutions_1, default=institutions_1)
-
-        # 5. Filtro por "Tipo_Insti"
-        insti_types = sorted(df['Tipo_Insti'].unique())
-        selected_insti_types = st.sidebar.multiselect('Tipo de Institución', insti_types, default=insti_types)
-
-        # 6. Filtro por "Tipo_Insti_1"
-        insti_types_1 = sorted(df['Tipo_Insti_1'].unique())
-        selected_insti_types_1 = st.sidebar.multiselect('Tipo de Institución_1', insti_types_1, default=insti_types_1)
-
-        # Filtros adicionales
-        dimensions = sorted(df['Dimensione'].unique())
-        selected_dimensions = st.sidebar.multiselect('Dimensión', dimensions, default=dimensions)
-
-        subdimensions = sorted(df['Subdimensi'].unique())
-        selected_subdimensions = st.sidebar.multiselect('Subdimensión', subdimensions, default=subdimensions)
-
-        states = sorted(df['Estado'].unique())
-        selected_states = st.sidebar.multiselect('Estado', states, default=states)
-
-        regions = sorted(df['Region'].unique())
-        selected_regions = st.sidebar.multiselect('Región', regions, default=regions)
-
-        comunas = sorted(df['comuna'].unique())
-        selected_comunas = st.sidebar.multiselect('Comuna', comunas, default=comunas)
-
-        rates = sorted(df['RATE'].unique())
-        selected_rates = st.sidebar.multiselect('RATE', rates, default=rates)
-
-
-        # Apply all filters
-        filtered_df = df[
-            (df['Anio_Presu'].isin(selected_years)) &
-            (df['Etapa'].isin(selected_stages)) &
-            (df['Institucio'].isin(selected_institutions)) &
-            (df['Institucio_1'].isin(selected_institutions_1)) &
-            (df['Tipo_Insti'].isin(selected_insti_types)) &
-            (df['Tipo_Insti_1'].isin(selected_insti_types_1)) &
-            (df['Dimensione'].isin(selected_dimensions)) &
-            (df['Subdimensi'].isin(selected_subdimensions)) &
-            (df['Estado'].isin(selected_states)) &
-            (df['Region'].isin(selected_regions)) &
-            (df['comuna'].isin(selected_comunas)) &
-            (df['RATE'].isin(selected_rates))
-        ]
 
         st.markdown('---')
 
@@ -100,7 +58,7 @@ def create_dashboard():
         if not filtered_df.empty:
             
             # Display a map
-            st.markdown(f'### Ubicación de Proyectos en el Mapa')
+            st.markdown(f'### Ubicación de Proyectos en el Mapa para {selected_region} - {selected_comuna}')
             st.map(filtered_df[['Latitud', 'Longitud']].rename(columns={'Latitud': 'lat', 'Longitud': 'lon'}))
             
             st.markdown('---')
