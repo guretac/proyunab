@@ -35,13 +35,13 @@ def create_dashboard():
         st.sidebar.header('Filtros')
 
         # Filtro de Comuna
-        comunas = ['Todas'] + sorted(df['comuna'].unique())
-        selected_comuna = st.sidebar.selectbox('Seleccionar Comuna', comunas)
+        comunas = ['Todas'] + sorted(df['Dimensione'].unique())
+        selected_comuna = st.sidebar.selectbox('Seleccionar Dimensiones', comunas)
 
         # Aplicar el filtro al DataFrame
         filtered_df = df.copy()
         if selected_comuna != 'Todas':
-            filtered_df = filtered_df[filtered_df['comuna'] == selected_comuna]
+            filtered_df = filtered_df[filtered_df['Dimensione'] == selected_comuna]
             
         st.markdown('---')
 
