@@ -1,6 +1,6 @@
 import streamlit as st
 import pandas as pd
-import matplotlib.pyplot as plt
+import plotly.express as px
 
 st.set_page_config(layout="wide")
 
@@ -59,19 +59,16 @@ def create_dashboard():
 
             st.markdown('---')
 
-            # Display a bar chart
+            # Display a bar chart using plotly
             st.markdown('### Costo Total por Comuna')
-            cost_by_comuna = filtered_df.groupby('comuna')['Costo_Tota'].sum().sort_values(ascending=False)
-            
-            fig, ax = plt.subplots(figsize=(12, 6))
-            cost_by_comuna.plot(kind='bar', ax=ax, color='skyblue')
-            ax.set_title('Costo Total por Comuna')
-            ax.set_xlabel('Comuna')
-            ax.set_ylabel('Costo Total (CLP)')
-            ax.ticklabel_format(style='plain', axis='y')
-            plt.xticks(rotation=45, ha='right')
-            plt.tight_layout()
-            st.pyplot(fig)
+            cost_by_comuna = filtered_df.groupby('comuna')['Costo_Tota'].sum().reset_index()
+            fig = px.bar(cost_by_comuna, 
+                         x='comuna', 
+                         y='Costo_Tota', 
+                         title='Costo Total por Comuna', 
+                         labels={'Costo_Tota': 'Costo Total (CLP)', 'comuna': 'Comuna'})
+            fig.update_layout(xaxis_tickangle=-45)
+            st.plotly_chart(fig, use_container_width=True)
 
         else:
             st.warning('No hay datos para la combinación de filtros seleccionada.')
