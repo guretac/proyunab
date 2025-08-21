@@ -34,23 +34,23 @@ def create_dashboard():
         # Sidebar filters
         st.sidebar.header('Filtros')
 
-        # Filtros de nivel superior: las opciones se cargan del DataFrame original (df)
-        selected_region = st.sidebar.selectbox('Seleccionar Región', ['Todas'] + sorted(df['Region'].unique()))
+        # Primer filtro: Región
+        regions = ['Todas'] + sorted(df['Region'].unique())
+        selected_region = st.sidebar.selectbox('Seleccionar Región', regions)
         
-        # Se genera un DataFrame temporal basado en la selección de la región
+        # DataFrame temporal para encadenar los filtros
+        temp_df = df.copy()
         if selected_region != 'Todas':
-            temp_df = df[df['Region'] == selected_region]
-        else:
-            temp_df = df.copy()
+            temp_df = temp_df[temp_df['Region'] == selected_region]
+        
+        # Segundo filtro: Comuna, que depende del primer filtro
+        comunas = ['Todas'] + sorted(temp_df['comuna'].unique())
+        selected_comuna = st.sidebar.selectbox('Seleccionar Comuna', comunas)
 
-        # Las opciones para la comuna ahora dependen del DataFrame temporal (temp_df)
-        selected_comuna = st.sidebar.selectbox('Seleccionar Comuna', ['Todas'] + sorted(temp_df['comuna'].unique()))
-
-        # Se crea el DataFrame final filtrado
+        # Aplicar el segundo filtro al DataFrame
         filtered_df = temp_df.copy()
         if selected_comuna != 'Todas':
             filtered_df = filtered_df[filtered_df['comuna'] == selected_comuna]
-
 
         st.markdown('---')
 
